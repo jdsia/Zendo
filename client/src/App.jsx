@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import './App.css';
 import axios from "axios";
 
 const API = 'http://localhost:5000'
@@ -27,14 +28,6 @@ export default function App() {
     fetchTasks(); // Refresh the task list to show the new task
   }
 
-  // sends a PUT requrest toggling the copleted field
-  //const toggleTask = async (task) => {
-  //  console.log('full task object:', task)
-  //  await axios.put(`${API}/tasks/${task.id}`, { completed: !task.completed})
-  //  fetchTasks(); // refreshes list
-
-  //}
-
   const toggleTask = async (task) => {
   await axios.put(`${API}/tasks/${task._id}`, { completed: !task.completed });
   fetchTasks();
@@ -46,30 +39,33 @@ export default function App() {
     fetchTasks();
   };
 
+
   return (
-  <div style={{ maxWidth: 500, margin: '2rem auto', fontFamily: 'sans-serif' }}>
+  <div className="app-container">
     <h1>To-Do</h1>
 
-    <input value={input} onChange={e => setInput(e.target.value)} placeholder="New task..." />
-    <button onClick={addTask}>Add</button>
+    <div className="add-task-row">
+      <input value={input} onChange={e => setInput(e.target.value)} placeholder="New task..." />
+      <button onClick={addTask}>Add</button>
+    </div>
 
-    <div>
+    <div className="filter-row">
       {['all', 'completed'].map(f => (
-        <button key={f} onClick={() => setFilter(f)} style={{ fontWeight: filter === f ? 'bold' : 'normal' }}>
-          {f}
+        <button key={f} onClick={() => setFilter(f)} className={filter === f ? 'active' : ''}>
+          {f.charAt(0).toUpperCase() + f.slice(1)}
         </button>
       ))}
     </div>
 
-    {tasks.map(task => (
-      <div key={task._id}>
-        <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} />
-        <span style={{ textDecoration: task.completed ? 'line-through' : 'none' }}>{task.title}</span>
-        <button onClick={() => deleteTask(task._id)}>✕</button>
-      </div>
-    ))}
+    <div className="tasks-list">
+      {tasks.map(task => (
+        <div className="task-card" key={task._id}>
+          <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} />
+          <span className={`task-title${task.completed ? ' completed' : ''}`}>{task.title}</span>
+          <button className="delete-btn" onClick={() => deleteTask(task._id)} title="Delete">✕</button>
+        </div>
+      ))}
+    </div>
   </div>
 );
-
-
 }
