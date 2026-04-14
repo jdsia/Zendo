@@ -7,6 +7,7 @@ const API = 'http://localhost:5000'
 export default function App() {
   const [tasks, setTasks] = useState([])
   const [input, setInput] = useState('')
+  const [dueDate, setDueDate] = useState('')
   const [filter, setFilter] = useState('all')
 
   // fetches tasks from the server, passing the current filter as a query 
@@ -22,9 +23,10 @@ export default function App() {
   // sends POST request to create a new tasks, then refreshes the list.
   const addTask = async () => {
     if (!input.trim()) return; // Don't submit if the input is empty or just whitespace
-    await axios.post(`${API}/tasks`, { title: input });
+    await axios.post(`${API}/tasks`, { title: input, dueDate });
     // using useState stuffs
     setInput(''); // Clear the input field after submitting
+    setDueDate('')
     fetchTasks(); // Refresh the task list to show the new task
   }
 
@@ -46,6 +48,13 @@ export default function App() {
 
     <div className="add-task-row">
       <input value={input} onChange={e => setInput(e.target.value)} placeholder="New task..." />
+        <input
+          type="date"
+          value={dueDate}
+          onChange={e => setDueDate(e.target.value)}
+          placeholder="Due date"
+          style={{ marginLeft: 8 }}
+        />
       <button onClick={addTask}>Add</button>
     </div>
 
@@ -56,12 +65,19 @@ export default function App() {
         </button>
       ))}
     </div>
-
     <div className="tasks-list">
       {tasks.map(task => (
         <div className="task-card" key={task._id}>
           <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} />
           <span className={`task-title${task.completed ? ' completed' : ''}`}>{task.title}</span>
+          <div className="task-dates">
+            {task.dueDate && (
+              <span className="due-date">Due: {new Date(task.dueDate).toLocaleDateString()}</span>
+            )}
+            {task.createdAt && (
+              <span className="created-date">Created: {new Date(task.createdAt).toLocaleDateString()}</span>
+            )}
+          </div>
           <button className="delete-btn" onClick={() => deleteTask(task._id)} title="Delete">✕</button>
         </div>
       ))}

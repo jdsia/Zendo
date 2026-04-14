@@ -17,7 +17,9 @@ app.get('/tasks', async(req, res) => {
 })
 
 app.post('/tasks', async (req,res) => {
-  const task = await Task.create({ title: req.body.title})
+  //const task = await Task.create({ title: req.body.title})
+  const { title, dueDate } = req.body; // <-- Destructure dueDate
+  const task = await Task.create({ title, dueDate }); // <-- Pass dueDate
   res.status(201).json(task) // send back newly created task
 })
 
