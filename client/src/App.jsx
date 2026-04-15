@@ -44,7 +44,7 @@ export default function App() {
 
   return (
   <div className="app-container">
-    <h1>To-Do</h1>
+    <h1>Tasker</h1>
 
     <div className="add-task-row">
       <input value={input} onChange={e => setInput(e.target.value)} placeholder="New task..." />

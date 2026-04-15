@@ -1,5 +1,5 @@
 const express = require('express')
-// lets frontend (port 3000) talk to server (port 5000)
+// cors lets frontend (port 3000) talk to server (port 5000)
 const cors = require('cors')
 require('./db') // runs db js establishing the connection
 const Task = require('./models/Task')
