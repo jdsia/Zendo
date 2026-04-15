@@ -198,6 +198,30 @@ h1 {
   transform: scale(1.15);
 }
 
+/*priority buttons*/
+.add-task-row select {
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px solid #e5e7eb;
+  background: #f9fafb;
+  font-size: 0.95rem;
+  color: #1f2937;
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.add-task-row select:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+}
+
+.add-task-row option {
+  background: #f9fafb;
+  color: #1f2937;
+}
+
 /* ------------------ */
 /* 📱 RESPONSIVENESS */
 /* ------------------ */
