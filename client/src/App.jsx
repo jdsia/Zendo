@@ -5,10 +5,11 @@ import axios from "axios";
 const API = 'http://localhost:5000'
 
 export default function App() {
-  const [tasks, setTasks] = useState([])
-  const [input, setInput] = useState('')
-  const [dueDate, setDueDate] = useState('')
-  const [filter, setFilter] = useState('all')
+  const [tasks, setTasks] = useState([]);
+  const [input, setInput] = useState('');
+  const [dueDate, setDueDate] = useState('');
+  const [filter, setFilter] = useState('all');
+  const [priority, setPriority] = useState('Medium');
 
   // fetches tasks from the server, passing the current filter as a query 
   const fetchTasks = async () => {
@@ -23,10 +24,11 @@ export default function App() {
   // sends POST request to create a new tasks, then refreshes the list.
   const addTask = async () => {
     if (!input.trim()) return; // Don't submit if the input is empty or just whitespace
-    await axios.post(`${API}/tasks`, { title: input, dueDate });
+    await axios.post(`${API}/tasks`, { title: input, dueDate, priority });
     // using useState stuffs
     setInput(''); // Clear the input field after submitting
-    setDueDate('')
+    setDueDate('');
+    setPriority('Medium') // Reset priority to default after adding a task
     fetchTasks(); // Refresh the task list to show the new task
   }
 
@@ -55,6 +57,12 @@ export default function App() {
           placeholder="Due date"
           style={{ marginLeft: 8 }}
         />
+        {/* Priority dropdown */}
+        <select value={priority} onChange={e => setPriority(e.target.value)} style={{ marginLeft: 8 }}>
+          <option value="Low">Low</option>
+          <option value="Medium">Medium</option>
+          <option value="High">High</option>
+        </select>
       <button onClick={addTask}>Add</button>
     </div>
 
@@ -68,8 +76,13 @@ export default function App() {
     <div className="tasks-list">
       {tasks.map(task => (
         <div className="task-card" key={task._id}>
+
           <input type="checkbox" checked={task.completed} onChange={() => toggleTask(task)} />
           <span className={`task-title${task.completed ? ' completed' : ''}`}>{task.title}</span>
+          <span className={`task-priority priority-${task.priority?.toLowerCase() || 'medium'}`} style={{ marginLeft: 8 }}>
+            [{task.priority || 'Medium'}]
+          </span>
+
           <div className="task-dates">
             {task.dueDate && (
               <span className="due-date">Due: {new Date(task.dueDate).toLocaleDateString()}</span>

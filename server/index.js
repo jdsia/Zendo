@@ -17,11 +17,12 @@ app.get('/tasks', async(req, res) => {
 })
 
 app.post('/tasks', async (req,res) => {
-  //const task = await Task.create({ title: req.body.title})
-  const { title, dueDate } = req.body; // <-- Destructure dueDate
-  const task = await Task.create({ title, dueDate }); // <-- Pass dueDate
+  const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
+  const task = await Task.create({ title, dueDate, priority }); // <-- Pass dueDate
   res.status(201).json(task) // send back newly created task
 })
+
+
 
 app.put('/tasks/:id', async (req, res) => {
   try {
