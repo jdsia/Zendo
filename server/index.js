@@ -1,22 +1,119 @@
 const express = require('express')
 // cors lets frontend (port 3000) talk to server (port 5000)
 const cors = require('cors')
+
+// authentication
+const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
+const cookieParser = require('cookie-parser')
+
 require('./db') // runs db js establishing the connection
+
+// models
 const Task = require('./models/Task')
+const User = require('./models/User')
 
 const app = express();
-app.use(cors()); // apply CORS middleware to all routes
+app.use(cors({
+  // might have to change this depending on the server im using
+  origin: 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+})); // apply CORS middleware to all routes
 app.use(express.json()) // parse incoming json request bodies, needed for req.body
+app.use(cookieParser())
+
+
+// authentication routes
+const auth = (req, res, next) => {
+  const token = req.cookies.token;
+
+  if (!token) return res.status(401).json({ message: 'Unauthorized' });
+
+  try {
+    const decoded = jwt.verify(token, 'secretkey');
+    req.user = decoded;
+    next();
+  } catch {
+    res.status(401).json({ message: 'Invalid token' });
+  }
+};
+// REGISTER
+app.post('/register', async (req, res) => {
+  try {
+    console.log('Registration request received:', req.body);
+    console.log('Headers:', req.headers);
+    
+    const { username, password } = req.body;
+
+    if (!username || !password) {
+      console.log('Missing username or password');
+      return res.status(400).json({ message: 'Username and password required' });
+    }
+
+    // Check if user already exists
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      console.log('Username already exists:', username);
+      return res.status(400).json({ message: 'Username already exists' });
+    }
+
+    console.log('Creating new user:', username);
+    const hashed = await bcrypt.hash(password, 10);
+
+    const user = new User({ username, password: hashed });
+    await user.save();
+
+    console.log('User created successfully:', username);
+    res.json({ message: 'User created' });
+  } catch (error) {
+    console.error('Registration error:', error);
+    res.status(500).json({ message: 'Registration failed' });
+  }
+});
+
+// LOGIN
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+
+  const user = await User.findOne({ username });
+  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+
+  const token = jwt.sign({ userId: user._id }, 'secretkey', { expiresIn: '1d' });
+
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'Lax'
+  });
+
+  res.json({ message: 'Logged in' });
+});
+
+// profile route
+app.get('/profile', auth, (req, res) => {
+  res.json({ userId: req.user.userId });
+});
+
+// LOGOUT
+app.post('/logout', (req, res) => {
+  res.clearCookie('token');
+  res.json({ message: 'Logged out' });
+});
+
 
 // get requests - fetch all Task
-app.get('/tasks', async(req, res) => {
+app.get('/tasks', auth, async(req, res) => {
   const { filter } = req.query // req.query holds URL query params
   const query = filter === 'completed' ? {completed: true} : {}
   const tasks = await Task.find(query).sort({ createdAt: -1 }); // Find matching tasks, newest first im assuming thats whats the -1 is for
   res.json(tasks); // Send the array of tasks back as JSON
 })
 
-app.post('/tasks', async (req,res) => {
+app.post('/tasks', auth, async (req,res) => {
   const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
   const task = await Task.create({ title, dueDate, priority }); // <-- Pass dueDate
   res.status(201).json(task) // send back newly created task
@@ -24,7 +121,7 @@ app.post('/tasks', async (req,res) => {
 
 
 
-app.put('/tasks/:id', async (req, res) => {
+app.put('/tasks/:id', auth, async (req, res) => {
   try {
     const task = await Task.findByIdAndUpdate(
       req.params.id,
@@ -39,7 +136,7 @@ app.put('/tasks/:id', async (req, res) => {
 });
 
 //DELETE task by ID
-app.delete('/tasks/:id', async (req, res) => {
+app.delete('/tasks/:id', auth, async (req, res) => {
   await Task.findByIdAndDelete(req.params.id); 
   res.status(204).send(); 
 });
