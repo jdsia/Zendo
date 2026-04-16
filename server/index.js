@@ -83,7 +83,7 @@ app.post('/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-  const token = jwt.sign({ userId: user._id }, 'secretkey', { expiresIn: '1d' });
+  const token = jwt.sign({ userId: user._id.toString() }, 'secretkey', { expiresIn: '1d' });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -105,17 +105,18 @@ app.post('/logout', (req, res) => {
 });
 
 
-// get requests - fetch all Task
+// get requests - fetch all Task for current user
 app.get('/tasks', auth, async(req, res) => {
   const { filter } = req.query // req.query holds URL query params
-  const query = filter === 'completed' ? {completed: true} : {}
+  const baseQuery = { user: req.user.userId } // Only fetch tasks for current user
+  const query = filter === 'completed' ? {...baseQuery, completed: true} : baseQuery
   const tasks = await Task.find(query).sort({ createdAt: -1 }); // Find matching tasks, newest first im assuming thats whats the -1 is for
   res.json(tasks); // Send the array of tasks back as JSON
 })
 
 app.post('/tasks', auth, async (req,res) => {
   const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
-  const task = await Task.create({ title, dueDate, priority }); // <-- Pass dueDate
+  const task = await Task.create({ title, dueDate, priority, user: req.user.userId }); // <-- Associate with current user
   res.status(201).json(task) // send back newly created task
 })
 
@@ -123,11 +124,15 @@ app.post('/tasks', auth, async (req,res) => {
 
 app.put('/tasks/:id', auth, async (req, res) => {
   try {
-    const task = await Task.findByIdAndUpdate(
-      req.params.id,
+    // Find task that belongs to current user
+    const task = await Task.findOneAndUpdate(
+      { _id: req.params.id, user: req.user.userId },
       { $set: req.body },
       { new: true }
     );
+    if (!task) {
+      return res.status(404).json({ message: 'Task not found' });
+    }
     res.json(task);
   } catch (err) {
     console.error('PUT error:', err.message);  // check your backend terminal
@@ -137,7 +142,10 @@ app.put('/tasks/:id', auth, async (req, res) => {
 
 //DELETE task by ID
 app.delete('/tasks/:id', auth, async (req, res) => {
-  await Task.findByIdAndDelete(req.params.id); 
+  const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+  if (!task) {
+    return res.status(404).json({ message: 'Task not found' });
+  }
   res.status(204).send(); 
 });
 
