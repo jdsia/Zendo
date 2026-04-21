@@ -146,7 +146,7 @@ export default function App() {
   }
   return (
   <div className="app-container">
-    <h1>To-Do</h1>
+    <h1>Tasker</h1>
     <div className="current-user">Current User: {username}</div>
     
     <button onClick={logout} className="delete-btn" style={{float: 'right', marginTop: '-3rem'}}>Logout</button>

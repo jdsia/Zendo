@@ -9,55 +9,40 @@
 
 body {
   font-family: 'Segoe UI', Arial, sans-serif;
-  background: linear-gradient(135deg, #eef2ff, #f8fafc);
+  background: #ffffff;
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 2rem 1rem;
   color: #1f2937;
+  line-height: 1.6;
 }
 
 /* MAIN CONTAINER */
 .app-container {
-  width: 100%;
-  max-width: 680px;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
   background: #ffffff;
-  border-radius: 20px;
-  padding: 2.5rem 2rem 2.8rem;
-  box-shadow: 0 15px 40px rgba(0,0,0,0.08);
-  border: 1px solid #eef2f7;
-  transition: all 0.2s ease;
 }
 
 /* TITLE */
 h1 {
-  text-align: center;
-  font-size: 1.9rem;
+  font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 1.8rem;
   color: #111827;
+  margin-bottom: 1rem;
+  text-align: left;
 }
 
 /* CURRENT USER */
 .current-user {
   display: inline-block;
-  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
-  padding: 0.6rem 1.2rem;
-  border-radius: 25px;
-  font-size: 0.85rem;
+  background: #f9fafb;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
   color: #374151;
   margin-bottom: 1.5rem;
-  text-align: center;
-  font-weight: 600;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-  transition: all 0.2s ease;
-}
-
-.current-user:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  font-weight: 500;
+  border: 1px solid #e5e7eb;
 }
 
 /* INPUT ROW */
