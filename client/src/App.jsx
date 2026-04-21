@@ -136,17 +136,29 @@ export default function App() {
   const logout = async () => {
   await axios.post(`${API}/logout`, {}, { withCredentials: true }); // 🔥 include credentials
   setIsLoggedIn(false);
+  setUsername('');
 };
 
   if (!isLoggedIn) {
     if (showRegister) {
       return <Register onRegister={() => { setShowRegister(false); fetchTasks(); }} onSwitchToLogin={() => setShowRegister(false)} />
     }
-  return <Login onLogin={() => { setIsLoggedIn(true); fetchTasks(); }} onShowRegister={() => setShowRegister(true)} />
+  return <Login onLogin={() => { 
+    setIsLoggedIn(true); 
+    // Fetch the profile to get the correct username for the newly logged-in user
+    axios.get(`${API}/profile`, { withCredentials: true })
+      .then((response) => {
+        setUsername(response.data.username);
+        fetchTasks();
+      })
+      .catch(() => {
+        setUsername('');
+      });
+  }} onShowRegister={() => setShowRegister(true)} />
   }
   return (
   <div className="app-container">
-    <h1>Tasker</h1>
+    <h1>Zendo</h1>
     <div className="current-user">Current User: {username}</div>
     
     <button onClick={logout} className="delete-btn" style={{float: 'right', marginTop: '-3rem'}}>Logout</button>
