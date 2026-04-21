@@ -192,7 +192,7 @@ export default function App() {
       </button>
     </div>
 
-    <div className="search-filter-row">
+    <div className="search-row">
       <input 
         type="text" 
         placeholder="Search tasks..." 
@@ -200,17 +200,18 @@ export default function App() {
         onChange={e => setSearchTerm(e.target.value)}
         className="search-input"
       />
-      <div className="filter-row">
-        {['all', 'completed'].map(f => (
-          <button 
-            key={f} 
-            onClick={() => setFilter(f)} 
-            className={filter === f ? 'active' : ''}
-          >
-            {f}
-          </button>
-        ))}
-      </div>
+    </div>
+
+    <div className="filter-row">
+      {['all', 'completed'].map(f => (
+        <button 
+          key={f} 
+          onClick={() => setFilter(f)} 
+          className={filter === f ? 'active' : ''}
+        >
+          {f}
+        </button>
+      ))}
     </div>
 
     <div className="tasks-list">
