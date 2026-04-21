@@ -39,6 +39,27 @@ h1 {
   color: #111827;
 }
 
+/* CURRENT USER */
+.current-user {
+  display: inline-block;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  padding: 0.6rem 1.2rem;
+  border-radius: 25px;
+  font-size: 0.85rem;
+  color: #374151;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-weight: 600;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  transition: all 0.2s ease;
+}
+
+.current-user:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
 /* INPUT ROW */
 .add-task-row {
   display: flex;

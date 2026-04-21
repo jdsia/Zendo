@@ -19,6 +19,7 @@ export default function App() {
   const [error, setError] = useState('')
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [username, setUsername] = useState('');
 
   // fetches tasks from the server, passing the current filter as a query 
   const fetchTasks = async () => {
@@ -32,8 +33,14 @@ export default function App() {
 
   useEffect(() => {
   axios.get(`${API}/profile`, { withCredentials: true })
-    .then(() => setIsLoggedIn(true))   // ✅ still logged in
-    .catch(() => setIsLoggedIn(false)) // ❌ not logged in
+    .then((response) => {
+      setIsLoggedIn(true);
+      setUsername(response.data.username);
+    })
+    .catch((response) => {
+      setIsLoggedIn(false);
+      setUsername('');
+    });
 }, []);
 
   // sends POST request to create a new tasks, then refreshes the list.
@@ -140,6 +147,8 @@ export default function App() {
   return (
   <div className="app-container">
     <h1>To-Do</h1>
+    <div className="current-user">Current User: {username}</div>
+    
     <button onClick={logout} className="delete-btn" style={{float: 'right', marginTop: '-3rem'}}>Logout</button>
 
     {error && <div className="auth-error">{error}</div>}
