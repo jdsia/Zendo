@@ -13,6 +13,13 @@ body {
   min-height: 100vh;
   color: #404040;
   line-height: 1.6;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* DARK MODE */
+body.dark-mode {
+  background: #1a1a1a;
+  color: #E5E5E5;
 }
 
 /* MAIN CONTAINER */
@@ -21,6 +28,25 @@ body {
   margin: 0 auto;
   padding: 3rem 2rem;
   background: #FFFFFF;
+  transition: background-color 0.3s ease;
+}
+
+body.dark-mode .app-container {
+  background: #1a1a1a;
+}
+
+/* HEADER ROW */
+.header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 /* TITLE */
@@ -28,9 +54,14 @@ h1 {
   font-size: 1.75rem;
   font-weight: 300;
   color: #262626;
-  margin-bottom: 2rem;
+  margin-bottom: 0;
   text-align: left;
   letter-spacing: -0.02em;
+  transition: color 0.3s ease;
+}
+
+body.dark-mode h1 {
+  color: #F5F5F5;
 }
 
 /* CURRENT USER */
@@ -44,6 +75,13 @@ h1 {
   margin-bottom: 2rem;
   font-weight: 400;
   border: 1px solid #F5F5F5;
+  transition: all 0.3s ease;
+}
+
+body.dark-mode .current-user {
+  background: #2a2a2a;
+  color: #A3A3A3;
+  border-color: #404040;
 }
 
 /* INPUT ROW */
@@ -61,6 +99,13 @@ h1 {
   background: #FAFAFA;
   font-size: 0.95rem;
   transition: all 0.15s ease;
+  color: #404040;
+}
+
+body.dark-mode .add-task-row input {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
 }
 
 .add-task-row input:focus {
@@ -68,6 +113,12 @@ h1 {
   border-color: #D4D4D4;
   background: #FFFFFF;
   box-shadow: 0 0 0 1px #E5E5E5;
+}
+
+body.dark-mode .add-task-row input:focus {
+  background: #333333;
+  border-color: #525252;
+  box-shadow: 0 0 0 1px #404040;
 }
 
 .add-task-row button {
@@ -81,13 +132,28 @@ h1 {
   transition: all 0.15s ease;
 }
 
+body.dark-mode .add-task-row button {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
+}
+
 .add-task-row button:hover {
   background: #F5F5F5;
   border-color: #E5E5E5;
 }
 
+body.dark-mode .add-task-row button:hover {
+  background: #333333;
+  border-color: #525252;
+}
+
 .add-task-row button:active {
   background: #E5E5E5;
+}
+
+body.dark-mode .add-task-row button:active {
+  background: #404040;
 }
 
 /* FILTER BUTTONS */
@@ -115,11 +181,24 @@ h1 {
   justify-content: center;
 }
 
+body.dark-mode .filter-row button {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #A3A3A3;
+}
+
 .filter-row button.active,
 .filter-row button:hover {
   background: #F5F5F5;
   color: #404040;
   border-color: #D4D4D4;
+}
+
+body.dark-mode .filter-row button.active,
+body.dark-mode .filter-row button:hover {
+  background: #333333;
+  color: #E5E5E5;
+  border-color: #525252;
 }
 
 /* TASK LIST */
@@ -141,9 +220,19 @@ h1 {
   transition: all 0.15s ease;
 }
 
+body.dark-mode .task-card {
+  background: #2a2a2a;
+  border-color: #404040;
+}
+
 .task-card:hover {
   background: #F5F5F5;
   border-color: #E5E5E5;
+}
+
+body.dark-mode .task-card:hover {
+  background: #333333;
+  border-color: #525252;
 }
 
 /* CHECKBOX */
@@ -169,9 +258,17 @@ h1 {
   font-weight: 400;
 }
 
+body.dark-mode .task-title {
+  color: #E5E5E5;
+}
+
 .task-title.completed {
   text-decoration: line-through;
   color: #A3A3A3;
+}
+
+body.dark-mode .task-title.completed {
+  color: #737373;
 }
 
 /* DATES */
@@ -183,13 +280,47 @@ h1 {
   color: #A3A3A3;
 }
 
+body.dark-mode .task-dates {
+  color: #737373;
+}
+
 .due-date {
   color: #737373;
   font-weight: 400;
 }
 
+body.dark-mode .due-date {
+  color: #A3A3A3;
+}
+
 .created-date {
   color: #A3A3A3;
+}
+
+body.dark-mode .created-date {
+  color: #737373;
+}
+
+/* THEME TOGGLE BUTTON */
+.theme-toggle {
+  background: transparent;
+  border: none;
+  color: #A3A3A3;
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 6px;
+  padding: 0.4rem 0.6rem;
+  transition: all 0.15s ease;
+}
+
+.theme-toggle:hover {
+  background: #F5F5F5;
+  color: #737373;
+}
+
+body.dark-mode .theme-toggle:hover {
+  background: #404040;
+  color: #D4D4D4;
 }
 
 /* DELETE BUTTON */
@@ -209,6 +340,11 @@ h1 {
   color: #737373;
 }
 
+body.dark-mode .delete-btn:hover {
+  background: #404040;
+  color: #D4D4D4;
+}
+
 /*priority buttons*/
 .add-task-row select {
   padding: 1rem 1.25rem;
@@ -221,6 +357,12 @@ h1 {
   cursor: pointer;
 }
 
+body.dark-mode .add-task-row select {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
+}
+
 .add-task-row select:focus {
   outline: none;
   border-color: #D4D4D4;
@@ -228,9 +370,20 @@ h1 {
   box-shadow: 0 0 0 1px #E5E5E5;
 }
 
+body.dark-mode .add-task-row select:focus {
+  background: #333333;
+  border-color: #525252;
+  box-shadow: 0 0 0 1px #404040;
+}
+
 .add-task-row option {
   background: #FAFAFA;
   color: #404040;
+}
+
+body.dark-mode .add-task-row option {
+  background: #2a2a2a;
+  color: #E5E5E5;
 }
 
 /* ------------------ */
@@ -306,10 +459,22 @@ h1 {
   transition: background 0.15s, color 0.15s;
 }
 
+body.dark-mode .task-priority {
+  background: #333333;
+  color: #A3A3A3;
+  border-color: #404040;
+}
+
 .priority-low {
   background: #FAFAFA;
   color: #737373;
   border-color: #E5E5E5;
+}
+
+body.dark-mode .priority-low {
+  background: #2a2a2a;
+  color: #A3A3A3;
+  border-color: #404040;
 }
 
 .priority-medium {
@@ -318,10 +483,22 @@ h1 {
   border-color: #D4D4D4;
 }
 
+body.dark-mode .priority-medium {
+  background: #333333;
+  color: #B8B8B8;
+  border-color: #404040;
+}
+
 .priority-high {
   background: #E5E5E5;
   color: #404040;
   border-color: #D4D4D4;
+}
+
+body.dark-mode .priority-high {
+  background: #404040;
+  color: #E5E5E5;
+  border-color: #525252;
 }
 
 /* AUTH STYLES */
@@ -341,6 +518,13 @@ h1 {
   background: #FAFAFA;
   font-size: 0.95rem;
   transition: all 0.15s ease;
+  color: #404040;
+}
+
+body.dark-mode .auth-input {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
 }
 
 .auth-input:focus {
@@ -348,6 +532,12 @@ h1 {
   border-color: #D4D4D4;
   background: #FFFFFF;
   box-shadow: 0 0 0 1px #E5E5E5;
+}
+
+body.dark-mode .auth-input:focus {
+  background: #333333;
+  border-color: #525252;
+  box-shadow: 0 0 0 1px #404040;
 }
 
 .auth-buttons {
@@ -367,14 +557,30 @@ h1 {
   font-size: 0.95rem;
 }
 
+body.dark-mode .auth-btn {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
+}
+
 .auth-btn.primary {
   background: #FAFAFA;
   color: #404040;
 }
 
+body.dark-mode .auth-btn.primary {
+  background: #333333;
+  color: #E5E5E5;
+}
+
 .auth-btn.primary:hover {
   background: #F5F5F5;
   border-color: #E5E5E5;
+}
+
+body.dark-mode .auth-btn.primary:hover {
+  background: #404040;
+  border-color: #525252;
 }
 
 .auth-btn.primary:active {
@@ -386,9 +592,19 @@ h1 {
   color: #737373;
 }
 
+body.dark-mode .auth-btn.secondary {
+  background: #2a2a2a;
+  color: #A3A3A3;
+}
+
 .auth-btn.secondary:hover {
   background: #F5F5F5;
   border-color: #E5E5E5;
+}
+
+body.dark-mode .auth-btn.secondary:hover {
+  background: #333333;
+  border-color: #404040;
 }
 
 .auth-btn.secondary:active {
@@ -404,6 +620,12 @@ h1 {
   border-radius: 6px;
   border: 1px solid #E5E5E5;
   margin-top: 0.75rem;
+}
+
+body.dark-mode .auth-error {
+  background: #2a2a2a;
+  color: #A3A3A3;
+  border-color: #404040;
 }
 
 /* Mobile responsiveness for auth */
@@ -437,6 +659,13 @@ h1 {
   font-size: 0.85rem;
   transition: all 0.15s ease;
   box-sizing: border-box;
+  color: #404040;
+}
+
+body.dark-mode .search-input {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #E5E5E5;
 }
 
 .search-input:focus {
@@ -444,6 +673,12 @@ h1 {
   border-color: #D4D4D4;
   background: #FFFFFF;
   box-shadow: 0 0 0 1px #E5E5E5;
+}
+
+body.dark-mode .search-input:focus {
+  background: #333333;
+  border-color: #525252;
+  box-shadow: 0 0 0 1px #404040;
 }
 
 /* LOADING AND EMPTY STATES */
@@ -454,6 +689,10 @@ h1 {
   font-size: 1rem;
 }
 
+body.dark-mode .loading {
+  color: #A3A3A3;
+}
+
 .no-tasks {
   text-align: center;
   padding: 3rem 2rem;
@@ -462,6 +701,12 @@ h1 {
   background: #FAFAFA;
   border-radius: 8px;
   border: 1px solid #E5E5E5;
+}
+
+body.dark-mode .no-tasks {
+  background: #2a2a2a;
+  color: #A3A3A3;
+  border-color: #404040;
 }
 
 /* TASK ACTIONS */
@@ -482,9 +727,23 @@ h1 {
   transition: all 0.15s ease;
 }
 
+body.dark-mode .edit-btn,
+body.dark-mode .save-btn,
+body.dark-mode .cancel-btn {
+  background: #2a2a2a;
+  border-color: #404040;
+  color: #A3A3A3;
+}
+
 .edit-btn:hover, .save-btn:hover {
   background: #F5F5F5;
   border-color: #D4D4D4;
+}
+
+body.dark-mode .edit-btn:hover,
+body.dark-mode .save-btn:hover {
+  background: #333333;
+  border-color: #525252;
 }
 
 .cancel-btn {
@@ -492,8 +751,17 @@ h1 {
   color: #737373;
 }
 
+body.dark-mode .cancel-btn {
+  background: #2a2a2a;
+  color: #A3A3A3;
+}
+
 .cancel-btn:hover {
   background: #F5F5F5;
+}
+
+body.dark-mode .cancel-btn:hover {
+  background: #333333;
 }
 
 .save-btn {
@@ -501,8 +769,17 @@ h1 {
   color: #404040;
 }
 
+body.dark-mode .save-btn {
+  background: #333333;
+  color: #E5E5E5;
+}
+
 .save-btn:hover {
   background: #E5E5E5;
+}
+
+body.dark-mode .save-btn:hover {
+  background: #404040;
 }
 
 /* EDIT FORM */
@@ -518,18 +795,39 @@ h1 {
   border: 1px solid #E5E5E5;
 }
 
+body.dark-mode .edit-form {
+  background: #2a2a2a;
+  border-color: #404040;
+}
+
 .edit-input, .edit-select, .edit-date {
   padding: 0.625rem;
   border-radius: 6px;
   border: 1px solid #E5E5E5;
   font-size: 0.9rem;
   background: #FFFFFF;
+  color: #404040;
+}
+
+body.dark-mode .edit-input,
+body.dark-mode .edit-select,
+body.dark-mode .edit-date {
+  background: #333333;
+  border-color: #404040;
+  color: #E5E5E5;
 }
 
 .edit-input:focus, .edit-select:focus, .edit-date:focus {
   outline: none;
   border-color: #D4D4D4;
   box-shadow: 0 0 0 1px #E5E5E5;
+}
+
+body.dark-mode .edit-input:focus,
+body.dark-mode .edit-select:focus,
+body.dark-mode .edit-date:focus {
+  border-color: #525252;
+  box-shadow: 0 0 0 1px #404040;
 }
 
 .edit-buttons {
@@ -545,6 +843,12 @@ h1 {
   opacity: 0.5;
   cursor: not-allowed;
   background: #F5F5F5;
+}
+
+body.dark-mode .add-task-row input:disabled,
+body.dark-mode .add-task-row select:disabled,
+body.dark-mode .add-task-row button:disabled {
+  background: #404040;
 }
 
 /* RESPONSIVE FOR NEW FEATURES */

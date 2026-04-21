@@ -20,6 +20,9 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [username, setUsername] = useState('');
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true';
+  });
 
   // fetches tasks from the server, passing the current filter as a query 
   const fetchTasks = async () => {
@@ -42,6 +45,20 @@ export default function App() {
       setUsername('');
     });
 }, []);
+
+  // Apply dark mode class to body and save to localStorage
+  useEffect(() => {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    localStorage.setItem('darkMode', darkMode);
+  }, [darkMode]);
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+  };
 
   // sends POST request to create a new tasks, then refreshes the list.
   const addTask = async () => {
@@ -158,10 +175,16 @@ export default function App() {
   }
   return (
   <div className="app-container">
-    <h1>Zendo</h1>
+    <div className="header-row">
+      <h1>Zendo</h1>
+      <div className="header-actions">
+        <button onClick={toggleDarkMode} className="theme-toggle">
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+        <button onClick={logout} className="delete-btn">Logout</button>
+      </div>
+    </div>
     <div className="current-user">Current User: {username}</div>
-    
-    <button onClick={logout} className="delete-btn" style={{float: 'right', marginTop: '-3rem'}}>Logout</button>
 
     {error && <div className="auth-error">{error}</div>}
     
