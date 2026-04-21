@@ -134,7 +134,7 @@ export default function App() {
   );
 
   const logout = async () => {
-  await axios.post(`${API}/logout`, {}, { withCredentials: true }); // 🔥 include credentials
+  await axios.post(`${API}/logout`, {}, { withCredentials: true }); 
   setIsLoggedIn(false);
   setUsername('');
 };
@@ -265,12 +265,12 @@ export default function App() {
                   </span>
                 </span>
                 <div className="task-dates">
-                  {task.dueDate && <span className="due-date">📅 {new Date(task.dueDate).toLocaleDateString()}</span>}
+                  {task.dueDate && <span className="due-date">Due: {new Date(task.dueDate).toLocaleDateString()}</span>}
                   <span className="created-date">Created: {new Date(task.createdAt).toLocaleDateString()}</span>
                 </div>
               </div>
               <div className="task-actions">
-                <button onClick={() => startEdit(task)} className="edit-btn">✏️</button>
+                <button onClick={() => startEdit(task)} className="edit-btn">edit️</button>
                 <button onClick={() => deleteTask(task._id)} className="delete-btn">✕</button>
               </div>
             </>
