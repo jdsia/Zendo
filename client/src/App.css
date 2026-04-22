@@ -235,6 +235,23 @@ body.dark-mode .task-card:hover {
   border-color: #525252;
 }
 
+/* DRAG AND DROP STYLES */
+.task-card.dragging {
+  opacity: 0.5;
+  transform: rotate(2deg);
+  cursor: grabbing;
+}
+
+.task-card.drag-over {
+  border-color: #737373;
+  background: #F5F5F5;
+}
+
+body.dark-mode .task-card.drag-over {
+  border-color: #A3A3A3;
+  background: #404040;
+}
+
 /* CHECKBOX */
 .task-card input[type="checkbox"] {
   width: 1.25rem;

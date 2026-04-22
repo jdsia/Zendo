@@ -116,13 +116,42 @@ app.get('/tasks', auth, async(req, res) => {
   const { filter } = req.query // req.query holds URL query params
   const baseQuery = { user: req.user.userId } // Only fetch tasks for current user
   const query = filter === 'completed' ? {...baseQuery, completed: true} : baseQuery
-  const tasks = await Task.find(query).sort({ createdAt: -1 }); // Find matching tasks, newest first im assuming thats whats the -1 is for
-  res.json(tasks); // Send the array of tasks back as JSON
+  
+  // Get tasks and assign order to those that don't have it
+  const tasks = await Task.find(query).sort({ createdAt: 1 }); // Get oldest first initially
+  
+  // Update tasks without order field
+  const tasksWithoutOrder = tasks.filter(task => task.order === undefined || task.order === null);
+  if (tasksWithoutOrder.length > 0) {
+    for (let i = 0; i < tasksWithoutOrder.length; i++) {
+      await Task.findByIdAndUpdate(tasksWithoutOrder[i]._id, { order: i });
+    }
+    // Refetch to get updated order
+    const updatedTasks = await Task.find(query).sort({ order: 1, createdAt: -1 });
+    res.json(updatedTasks);
+  } else {
+    const sortedTasks = tasks.sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    res.json(sortedTasks);
+  }
 })
 
 app.post('/tasks', auth, async (req,res) => {
   const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
-  const task = await Task.create({ title, dueDate, priority, user: req.user.userId }); // <-- Associate with current user
+  
+  // Get the current highest order for this user
+  const lastTask = await Task.findOne({ user: req.user.userId }).sort({ order: -1 });
+  const newOrder = lastTask ? lastTask.order + 1 : 0;
+  
+  const task = await Task.create({ 
+    title, 
+    dueDate, 
+    priority, 
+    order: newOrder, // <-- Assign order to new task
+    user: req.user.userId 
+  }); // <-- Associate with current user
   res.status(201).json(task) // send back newly created task
 })
 
@@ -143,6 +172,28 @@ app.put('/tasks/:id', auth, async (req, res) => {
   } catch (err) {
     console.error('PUT error:', err.message);  // check your backend terminal
     res.status(500).json({ error: err.message });  // also sends it to the browser
+  }
+});
+
+// REORDER tasks
+app.post('/tasks/reorder', auth, async (req, res) => {
+  try {
+    const { taskIds } = req.body; // Array of task IDs in new order
+    
+    // Update each task with its new order
+    const updatePromises = taskIds.map((taskId, index) => 
+      Task.findOneAndUpdate(
+        { _id: taskId, user: req.user.userId },
+        { order: index },
+        { new: true }
+      )
+    );
+    
+    await Promise.all(updatePromises);
+    res.json({ message: 'Tasks reordered successfully' });
+  } catch (err) {
+    console.error('Reorder error:', err);
+    res.status(500).json({ error: err.message });
   }
 });
 

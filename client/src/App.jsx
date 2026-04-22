@@ -24,6 +24,57 @@ export default function App() {
     return localStorage.getItem('darkMode') === 'true';
   });
 
+  // handle drag and drop
+  const [dragIndex, setDragIndex] = useState(null);
+  const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  const handleDragStart = (index) => {
+    setDragIndex(index);
+  }
+
+  const handleDragOver = (e) => {
+    e.preventDefault(); // without this the drop event will never fire.
+  }
+
+  const handleDragEnter = (index) => {
+    setDragOverIndex(index);
+  }
+
+  const handleDragLeave = () => {
+    setDragOverIndex(null);
+  }
+
+  const persistTaskOrder = async (updatedTasks) => {
+    try {
+      const taskIds = updatedTasks.map(task => task._id);
+      await axios.post(`${API}/tasks/reorder`, { taskIds }, { withCredentials: true });
+    } catch (err) {
+      console.error('Failed to persist task order:', err);
+    }
+  };
+
+  const handleDrop = async (index) => {
+    if (dragIndex === null || dragIndex === index) return;
+    
+    const updated = [...tasks]
+    const draggedTask = updated[dragIndex]
+
+    updated.splice(dragIndex, 1)
+    updated.splice(index, 0, draggedTask);
+
+    setTasks(updated);
+    setDragIndex(null);
+    setDragOverIndex(null);
+    
+    // Persist the new order to backend
+    await persistTaskOrder(updated);
+  }
+
+  const handleDragEnd = () => {
+    setDragIndex(null);
+    setDragOverIndex(null);
+  }
+
   // fetches tasks from the server, passing the current filter as a query 
   const fetchTasks = async () => {
     const url = filter === 'all' ? `${API}/tasks` : `${API}/tasks?filter=${filter}`;
@@ -244,8 +295,22 @@ export default function App() {
           {searchTerm ? 'No tasks found matching your search' : 'No tasks yet. Add one above!'}
         </div>
       )}
-      {!loading && filteredTasks.map(task => (
-        <div key={task._id} className="task-card">
+      {!loading && filteredTasks.map((task, index) => (
+        <div 
+          key={task._id} 
+          className={`task-card ${
+            dragIndex === index ? 'dragging' : ''
+          } ${
+            dragOverIndex === index ? 'drag-over' : ''
+          }`}
+          draggable
+          onDragStart={() => handleDragStart(index)}
+          onDragOver={handleDragOver}
+          onDragEnter={() => handleDragEnter(index)}
+          onDragLeave={handleDragLeave}
+          onDrop={() => handleDrop(index)}
+          onDragEnd={handleDragEnd}
+        >
           {editingTask === task._id ? (
             <div className="edit-form">
               <input 

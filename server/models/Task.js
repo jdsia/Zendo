@@ -7,6 +7,7 @@ const TaskSchema = new mongoose.Schema({
   dueDate: { type: Date }, 
   createdAt: { type: Date, default: Date.now },
   priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' }, // <-- add this line
+  order: { type: Number, default: 0 }, // <-- add order field for drag-and-drop
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true } // <-- associate tasks with users
 }, { timestamps: true }); // <-- This adds createdAt and updatedAt automatically
 
