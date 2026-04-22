@@ -12,6 +12,8 @@ Zendo is a full-stack to-do application built with the MERN stack. It focuses on
 * Clean and minimal interface
 * User accounts with secure authentication
 * Persistent data storage
+* Drag and drop to reorder tasks
+* Dark mode support
 
 ---
 
