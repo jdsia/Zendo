@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
 
-const connectDB = require('./db') // runs db js establishing the connection
+require('./db') // runs db js establishing the connection
 
 // models
 const Task = require('./models/Task')
@@ -42,7 +42,6 @@ const auth = (req, res, next) => {
 // REGISTER
 app.post('/register', async (req, res) => {
   try {
-    await connectDB(); // Ensure database connection
     console.log('Registration request received:', req.body);
     console.log('Headers:', req.headers);
     
@@ -76,34 +75,27 @@ app.post('/register', async (req, res) => {
 
 // LOGIN
 app.post('/login', async (req, res) => {
-  try {
-    await connectDB(); // Ensure database connection
-    const { username, password } = req.body;
+  const { username, password } = req.body;
 
-    const user = await User.findOne({ username });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+  const user = await User.findOne({ username });
+  if (!user) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(400).json({ message: 'Invalid credentials' });
+  const match = await bcrypt.compare(password, user.password);
+  if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-    const token = jwt.sign({ userId: user._id.toString() }, 'secretkey', { expiresIn: '1d' });
+  const token = jwt.sign({ userId: user._id.toString() }, 'secretkey', { expiresIn: '1d' });
 
-    res.cookie('token', token, {
-      httpOnly: true,
-      sameSite: 'Lax'
-    });
+  res.cookie('token', token, {
+    httpOnly: true,
+    sameSite: 'Lax'
+  });
 
-    res.json({ message: 'Logged in' });
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({ message: 'Login failed' });
-  }
+  res.json({ message: 'Logged in' });
 });
 
 // profile
 app.get('/profile', auth, async (req, res) => {
   try {
-    await connectDB(); // Ensure database connection
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ userId: req.user.userId, username: user.username });
@@ -121,65 +113,52 @@ app.post('/logout', (req, res) => {
 
 // get requests - fetch all Task for current user
 app.get('/tasks', auth, async(req, res) => {
-  try {
-    await connectDB(); // Ensure database connection
-    const { filter } = req.query // req.query holds URL query params
-    const baseQuery = { user: req.user.userId } // Only fetch tasks for current user
-    const query = filter === 'completed' ? {...baseQuery, completed: true} : baseQuery
-    
-    // Get tasks and assign order to those that don't have it
-    const tasks = await Task.find(query).sort({ createdAt: 1 }); // Get oldest first initially
-    
-    // Update tasks without order field
-    const tasksWithoutOrder = tasks.filter(task => task.order === undefined || task.order === null);
-    if (tasksWithoutOrder.length > 0) {
-      for (let i = 0; i < tasksWithoutOrder.length; i++) {
-        await Task.findByIdAndUpdate(tasksWithoutOrder[i]._id, { order: i });
-      }
-      // Refetch to get updated order
-      const updatedTasks = await Task.find(query).sort({ order: 1, createdAt: -1 });
-      res.json(updatedTasks);
-    } else {
-      const sortedTasks = tasks.sort((a, b) => {
-        if (a.order !== b.order) return a.order - b.order;
-        return new Date(b.createdAt) - new Date(a.createdAt);
-      });
-      res.json(sortedTasks);
+  const { filter } = req.query // req.query holds URL query params
+  const baseQuery = { user: req.user.userId } // Only fetch tasks for current user
+  const query = filter === 'completed' ? {...baseQuery, completed: true} : baseQuery
+  
+  // Get tasks and assign order to those that don't have it
+  const tasks = await Task.find(query).sort({ createdAt: 1 }); // Get oldest first initially
+  
+  // Update tasks without order field
+  const tasksWithoutOrder = tasks.filter(task => task.order === undefined || task.order === null);
+  if (tasksWithoutOrder.length > 0) {
+    for (let i = 0; i < tasksWithoutOrder.length; i++) {
+      await Task.findByIdAndUpdate(tasksWithoutOrder[i]._id, { order: i });
     }
-  } catch (error) {
-    console.error('Tasks fetch error:', error);
-    res.status(500).json({ message: 'Failed to fetch tasks' });
+    // Refetch to get updated order
+    const updatedTasks = await Task.find(query).sort({ order: 1, createdAt: -1 });
+    res.json(updatedTasks);
+  } else {
+    const sortedTasks = tasks.sort((a, b) => {
+      if (a.order !== b.order) return a.order - b.order;
+      return new Date(b.createdAt) - new Date(a.createdAt);
+    });
+    res.json(sortedTasks);
   }
 })
 
 app.post('/tasks', auth, async (req,res) => {
-  try {
-    await connectDB(); // Ensure database connection
-    const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
-    
-    // Get the current highest order for this user
-    const lastTask = await Task.findOne({ user: req.user.userId }).sort({ order: -1 });
-    const newOrder = lastTask ? lastTask.order + 1 : 0;
-    
-    const task = await Task.create({ 
-      title, 
-      dueDate, 
-      priority, 
-      order: newOrder, // <-- Assign order to new task
-      user: req.user.userId 
-    }); // <-- Associate with current user
-    res.status(201).json(task) // send back newly created task
-  } catch (error) {
-    console.error('Task creation error:', error);
-    res.status(500).json({ message: 'Failed to create task' });
-  }
+  const { title, dueDate, priority } = req.body; // <-- Destructure dueDate
+  
+  // Get the current highest order for this user
+  const lastTask = await Task.findOne({ user: req.user.userId }).sort({ order: -1 });
+  const newOrder = lastTask ? lastTask.order + 1 : 0;
+  
+  const task = await Task.create({ 
+    title, 
+    dueDate, 
+    priority, 
+    order: newOrder, // <-- Assign order to new task
+    user: req.user.userId 
+  }); // <-- Associate with current user
+  res.status(201).json(task) // send back newly created task
 })
 
 
 
 app.put('/tasks/:id', auth, async (req, res) => {
   try {
-    await connectDB(); // Ensure database connection
     // Find task that belongs to current user
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.userId },
@@ -199,7 +178,6 @@ app.put('/tasks/:id', auth, async (req, res) => {
 // REORDER tasks
 app.post('/tasks/reorder', auth, async (req, res) => {
   try {
-    await connectDB(); // Ensure database connection
     const { taskIds } = req.body; // Array of task IDs in new order
     
     // Update each task with its new order
@@ -221,19 +199,12 @@ app.post('/tasks/reorder', auth, async (req, res) => {
 
 //DELETE task by ID
 app.delete('/tasks/:id', auth, async (req, res) => {
-  try {
-    await connectDB(); // Ensure database connection
-    const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
-    if (!task) {
-      return res.status(404).json({ message: 'Task not found' });
-    }
-    res.status(204).send(); 
-  } catch (error) {
-    console.error('Task deletion error:', error);
-    res.status(500).json({ message: 'Failed to delete task' });
+  const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
+  if (!task) {
+    return res.status(404).json({ message: 'Task not found' });
   }
+  res.status(204).send(); 
 });
 
-// Export for Vercel serverless
-module.exports = app;
+app.listen(5000, () => console.log('Server running on port 5000')); // Start the server on port 5000
 
