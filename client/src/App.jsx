@@ -207,8 +207,6 @@ export default function App() {
   setUsername('');
 };
 
-
- // Actual App 
   if (!isLoggedIn) {
     if (showRegister) {
       return <Register onRegister={() => { setShowRegister(false); fetchTasks(); }} onSwitchToLogin={() => setShowRegister(false)} />
