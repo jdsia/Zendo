@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import './App.css'
 
-const API = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API = '/api';
 
 export default function Register({ onRegister, onSwitchToLogin }) {
   const [username, setUsername] = useState('');
