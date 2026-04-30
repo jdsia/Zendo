@@ -11,14 +11,21 @@ export default function Register({ onRegister, onSwitchToLogin }) {
 
   const handleRegister = async () => {
     setError('');
+    console.log('Register clicked - API URL:', API);
+    console.log('Register data:', { username, password });
+    
     if (!username.trim() || !password.trim()) {
       setError('Username and password required');
       return;
     }
     try {
-      await axios.post(`${API}/register`, { username, password }, { withCredentials: true });
+      console.log('Making request to:', `${API}/register`);
+      const response = await axios.post(`${API}/register`, { username, password }, { withCredentials: true });
+      console.log('Register response:', response);
       onRegister(); // tell App to switch to login or log in
     } catch (err) {
+      console.error('Register error:', err);
+      console.error('Error response:', err.response);
       setError(err.response?.data?.message || 'Registration failed');
     }
   };
