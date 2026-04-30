@@ -3,21 +3,44 @@ const cors = require('cors')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const cookieParser = require('cookie-parser')
-require('dotenv').config()
-
-// Import models
-const Task = require('../server/models/Task')
-const User = require('../server/models/User')
 
 // Database connection
 const mongoose = require('mongoose')
 
+// Define inline schemas to avoid import issues
+const TaskSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  completed: { type: Boolean, default: false },
+  dueDate: { type: Date }, 
+  createdAt: { type: Date, default: Date.now },
+  priority: { type: String, enum: ['Low', 'Medium', 'High'], default: 'Medium' },
+  order: { type: Number, default: 0 },
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }
+}, { timestamps: true });
+
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+});
+
+const Task = mongoose.models.Task || mongoose.model('Task', TaskSchema);
+const User = mongoose.models.User || mongoose.model('User', UserSchema);
+
 // Connect to MongoDB
-if (!mongoose.connection.readyState) {
-  mongoose.connect(process.env.MONGO_URI)
-    .then(() => console.log("MongoDB Connected"))
-    .catch(err => console.error("MongoDB Error:", err));
-}
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) return;
+  
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    isConnected = true;
+    console.log("MongoDB Connected");
+  } catch (err) {
+    console.error("MongoDB Error:", err);
+    throw err;
+  }
+};
 
 const app = express();
 
@@ -49,6 +72,7 @@ const auth = (req, res, next) => {
 // Routes
 app.post('/register', async (req, res) => {
   try {
+    await connectDB();
     console.log('Registration request received:', req.body);
     const { username, password } = req.body;
 
@@ -75,6 +99,7 @@ app.post('/register', async (req, res) => {
 
 app.post('/login', async (req, res) => {
   try {
+    await connectDB();
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     if (!user) return res.status(400).json({ message: 'Invalid credentials' });
@@ -98,6 +123,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/profile', auth, async (req, res) => {
   try {
+    await connectDB();
     const user = await User.findById(req.user.userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
     res.json({ userId: req.user.userId, username: user.username });
@@ -114,6 +140,7 @@ app.post('/logout', (req, res) => {
 // Task routes
 app.get('/tasks', auth, async (req, res) => {
   try {
+    await connectDB();
     const { filter } = req.query;
     const baseQuery = { user: req.user.userId };
     const query = filter === 'completed' ? { ...baseQuery, completed: true } : baseQuery;
@@ -127,6 +154,7 @@ app.get('/tasks', auth, async (req, res) => {
 
 app.post('/tasks', auth, async (req, res) => {
   try {
+    await connectDB();
     const { title, dueDate, priority } = req.body;
     const lastTask = await Task.findOne({ user: req.user.userId }).sort({ order: -1 });
     const newOrder = lastTask ? lastTask.order + 1 : 0;
@@ -146,6 +174,7 @@ app.post('/tasks', auth, async (req, res) => {
 
 app.put('/tasks/:id', auth, async (req, res) => {
   try {
+    await connectDB();
     const task = await Task.findOneAndUpdate(
       { _id: req.params.id, user: req.user.userId },
       { $set: req.body },
@@ -162,6 +191,7 @@ app.put('/tasks/:id', auth, async (req, res) => {
 
 app.delete('/tasks/:id', auth, async (req, res) => {
   try {
+    await connectDB();
     const task = await Task.findOneAndDelete({ _id: req.params.id, user: req.user.userId });
     if (!task) {
       return res.status(404).json({ message: 'Task not found' });
@@ -174,6 +204,7 @@ app.delete('/tasks/:id', auth, async (req, res) => {
 
 app.post('/tasks/reorder', auth, async (req, res) => {
   try {
+    await connectDB();
     const { taskIds } = req.body;
     const updatePromises = taskIds.map((taskId, index) => 
       Task.findOneAndUpdate(
