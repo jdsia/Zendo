@@ -29,7 +29,8 @@
     },
     {
       "src": "/api/tasks",
-      "dest": "/api/tasks.js"
+      "dest": "/api/tasks.js",
+      "methods": ["GET"]
     },
     {
       "src": "/api/tasks",
