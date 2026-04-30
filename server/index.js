@@ -210,4 +210,9 @@ app.delete('/tasks/:id', auth, async (req, res) => {
 // remove for VERCEL
 //app.listen(5000, () => console.log('Server running on port 5000')); // Start the server on port 5000
 
+// For local development
+if (process.env.NODE_ENV !== 'production') {
+  app.listen(5000, () => console.log('Server running on port 5000'));
+}
+
 module.exports = app;
