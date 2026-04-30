@@ -42,6 +42,10 @@
       "methods": ["POST"]
     },
     {
+      "src": "/api/tasks/reorder",
+      "dest": "/api/tasks-reorder.js"
+    },
+    {
       "src": "/api/tasks/(.*)",
       "dest": "/api/tasks-put.js",
       "methods": ["PUT"]
