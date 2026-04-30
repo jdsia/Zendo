@@ -1,4 +1,4 @@
-const express = require('express')
+ express = require('express')
 // cors lets frontend (port 3000) talk to server (port 5000)
 const cors = require('cors')
 
@@ -32,7 +32,8 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'Unauthorized' });
 
   try {
-    const decoded = jwt.verify(token, 'secretkey');
+    //const decoded = jwt.verify(token, 'secretkey');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secretkey');
     req.user = decoded;
     next();
   } catch {
@@ -83,7 +84,7 @@ app.post('/login', async (req, res) => {
   const match = await bcrypt.compare(password, user.password);
   if (!match) return res.status(400).json({ message: 'Invalid credentials' });
 
-  const token = jwt.sign({ userId: user._id.toString() }, 'secretkey', { expiresIn: '1d' });
+  const token = jwt.sign({ userId: user._id.toString() }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1d' });
 
   res.cookie('token', token, {
     httpOnly: true,
@@ -206,5 +207,7 @@ app.delete('/tasks/:id', auth, async (req, res) => {
   res.status(204).send(); 
 });
 
-app.listen(5000, () => console.log('Server running on port 5000')); // Start the server on port 5000
+// remove for VERCEL
+//app.listen(5000, () => console.log('Server running on port 5000')); // Start the server on port 5000
 
+module.exports = app;
