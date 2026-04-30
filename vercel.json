@@ -24,6 +24,10 @@
       "dest": "/api/login.js"
     },
     {
+      "src": "/api/logout",
+      "dest": "/api/logout.js"
+    },
+    {
       "src": "/api/profile",
       "dest": "/api/profile.js"
     },
