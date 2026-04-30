@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
 // Define User schema inline
 const UserSchema = new mongoose.Schema({
@@ -50,21 +51,27 @@ module.exports = async (req, res) => {
     // Connect to database
     await connectDB();
     
-    // Check if user already exists
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: 'Username already exists' });
+    // Find user
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid credentials' });
     }
     
-    // Hash password and create user
-    const hashed = await bcrypt.hash(password, 10);
-    const user = new User({ username, password: hashed });
-    await user.save();
+    // Check password
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(400).json({ message: 'Invalid credentials' });
+    }
     
-    console.log('User created successfully:', username);
-    res.json({ message: 'User created' });
+    // Create JWT token
+    const token = jwt.sign({ userId: user._id.toString() }, process.env.JWT_SECRET || 'secretkey', { expiresIn: '1d' });
+    
+    // Set cookie
+    res.setHeader('Set-Cookie', `token=${token}; HttpOnly; SameSite=Lax; Path=/`);
+    
+    res.json({ message: 'Logged in' });
   } catch (error) {
-    console.error('Registration error:', error);
-    res.status(500).json({ message: 'Registration failed' });
+    console.error('Login error:', error);
+    res.status(500).json({ message: 'Login failed' });
   }
 };
