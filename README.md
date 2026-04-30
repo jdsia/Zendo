@@ -30,6 +30,9 @@ Zendo includes a complete authentication system:
 
 ## Technologies Used
 
+### Hosting
+* Vercel (Frontend and API)
+* MongDB Atlas (Database)
 ### Frontend
 
 * React 19
