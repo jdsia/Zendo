@@ -32,6 +32,21 @@
       "dest": "/api/tasks.js"
     },
     {
+      "src": "/api/tasks",
+      "dest": "/api/tasks-post.js",
+      "methods": ["POST"]
+    },
+    {
+      "src": "/api/tasks/(.*)",
+      "dest": "/api/tasks-put.js",
+      "methods": ["PUT"]
+    },
+    {
+      "src": "/api/tasks/(.*)",
+      "dest": "/api/tasks-delete.js",
+      "methods": ["DELETE"]
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/index.js"
     },
